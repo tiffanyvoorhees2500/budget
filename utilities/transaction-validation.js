@@ -8,11 +8,11 @@ const transactionValidationRules = () => {
       .notEmpty()
       .isString()
       .withMessage('An account name is requires'),
-    body('transactionAmount').isDecimal({
-      decimal_digits: '2,2',
-      locale: 'en-US',
-      force_decimal: true,
-    }),
+    body('transactionAmount')
+      .trim()
+      .toFloat()
+      .isFloat({ decimal_digits: '2' })
+      .withMessage('Error with your transactionAmount'),
     body('transactionDescription')
       .trim()
       .notEmpty()
