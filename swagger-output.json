@@ -5,7 +5,7 @@
     "description": "Budgeting",
     "version": "1.0.0"
   },
-  "host": "cse341-web-services-bd0o.onrender.com",
+  "host": "budgetwithtiffany.onrender.com/",
   "basePath": "/",
   "schemes": [
     "https"
