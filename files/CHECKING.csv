@@ -1,0 +1,10 @@
+Transaction ID	Posting Date	Effective Date	Transaction Type	Amount	Check Number	Reference Number	Description	Transaction Category	Type	Balance	Memo	Extended Description													
+"20230831 986406 9,300 14,684,462"	8/31/2023	8/31/2023	Credit	93		2382874029	Deposit Transfer		Transfer	4569.27		Deposit Transfer													
+"20230831 986406 92,807 14,684,460"	8/31/2023	8/31/2023	Credit	928.07		2382874028	Deposit Transfer		Transfer	4476.27		Deposit Transfer													
+"20230831 986406 200 14,639,676"	8/31/2023	8/31/2023	Debit	-2		2382874030	Withdrawal Paper		Withdrawal	3548.2		Withdrawal Paper													
+"20230831 986406 235,861 2,928,740"	8/31/2023	8/31/2023	Credit	2358.61		2380084876	Modere Deposit	Paychecks/Salary	Retail ACH	3550.2		Deposit ACH MODE TYPE: DIRECT DEP CO: MODERE Entry Class Code: PPD ACH Trace Number: 3													
+"20230830 986406 17,421 10,315,606"	8/30/2023	8/30/2023	Credit	174.21		2379371389	From Share 04 Balance Correction XX-2023	Transfers	Transfer	1191.59		From Share 04 Balance Correction 8-30-2023													
+"20230830 986406 51,775 10,066,665"	8/30/2023	8/30/2023	Credit	517.75		2379269600	From Share 07 Balance Correction XX-2023	Transfers	Transfer	1017.38		From Share 07 Balance Correction 8-30-2023													
+"20230830 986406 31,923 10,058,638"	8/30/2023	8/30/2023	Debit	-319.23		2379265365	To Share 06 Miscalculated last time	Transfers	Withdrawal	499.63		To Share 06 Miscalculated last time													
+"20230830 986406 60,556 9,906,542"	8/30/2023	8/30/2023	Credit	605.56		2379251047	From Share 06 Make balance right XX-2023	Transfers	Transfer	818.86		From Share 06 Make balance right 08-30-2023													
+"20230825 986406 31,673 3,183,119"	8/25/2023	8/25/2023	Debit	-316.73		2371319940	Payment to Spanish Fork City	Utilities	Retail ACH	213.3		Withdrawal ACH S TYPE: CUST PMTS CO: SPANISH FK CITY Entry Class Code: PPD ACH Trace Number: 9													
