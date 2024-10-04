@@ -5,10 +5,9 @@
     "description": "Budgeting",
     "version": "1.0.0"
   },
-  "host": "localhost:3000",
+  "host": "cse341-web-services-bd0o.onrender.com",
   "basePath": "/",
   "schemes": [
-    "http",
     "https"
   ],
   "paths": {
