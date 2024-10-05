@@ -7,9 +7,7 @@
   },
   "host": "budgetwithtiffany.onrender.com",
   "basePath": "/",
-  "schemes": [
-    "https"
-  ],
+  "schemes": ["https"],
   "paths": {
     "/": {
       "get": {
@@ -23,16 +21,15 @@
     },
     "/transactions/": {
       "get": {
-        "tags": [
-          "Transactions"
-        ],
+        "tags": ["Transactions"],
         "description": "",
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "422": {
+            "description": "Unprocessable Entity"
           },
           "500": {
             "description": "Internal Server Error"
@@ -40,9 +37,7 @@
         }
       },
       "post": {
-        "tags": [
-          "Transactions"
-        ],
+        "tags": ["Transactions"],
         "description": "\r  {\r  \"accountName\": \"Cash\",\r  \"transactionAmount\": 5,\r  \"transactionDate\": \"2024-10-03T00:00:00.000Z\",\r  \"transactionDescription\": \"Isaac gave me cash\"\r  }\r  ",
         "parameters": [
           {
@@ -82,13 +77,9 @@
     },
     "/transactions/{transactionId}": {
       "get": {
-        "tags": [
-          "Transactions"
-        ],
+        "tags": ["Transactions"],
         "description": "",
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "parameters": [
           {
             "name": "transactionId",
@@ -104,15 +95,16 @@
           "404": {
             "description": "Not Found"
           },
+          "422": {
+            "description": "Unprocessable Entity"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
       },
       "put": {
-        "tags": [
-          "Transactions"
-        ],
+        "tags": ["Transactions"],
         "description": "\r  {\r  \"accountName\": \"Cash\",\r  \"transactionAmount\": 5,\r  \"transactionDate\": \"2024-10-03T00:00:00.000Z\",\r  \"transactionDescription\": \"Alex gave me cash\"\r  }\r  ",
         "parameters": [
           {
@@ -156,9 +148,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Transactions"
-        ],
+        "tags": ["Transactions"],
         "description": "",
         "parameters": [
           {
@@ -172,6 +162,9 @@
           "204": {
             "description": "No Content"
           },
+          "422": {
+            "description": "Unprocessable Entity"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -180,22 +173,16 @@
     },
     "/transactions/import": {
       "post": {
-        "tags": [
-          "Transactions"
-        ],
-        "description": "Testing file Path: C:\\\\\\\\Users\\\\\\\\Admin\\\\\\\\OneDrive - BYU-Idaho\\\\\\\\Backend Classes\\\\\\\\CSE341-Web Services- Assignments\\\\\\\\CSE341_Week03-04_Project_Budget\\\\\\\\files\\\\\\\\CHECKING.csv",
+        "tags": ["Transactions"],
+        "summary": "upload a csv file",
+        "consumes": ["multipart/form-data"],
         "parameters": [
           {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "csvFilePath": {
-                  "example": "any"
-                }
-              }
-            }
+            "name": "csvFile",
+            "in": "formData",
+            "description": "CSV file to upload",
+            "required": true,
+            "type": "file"
           }
         ],
         "responses": {
@@ -205,6 +192,9 @@
           "400": {
             "description": "Bad Request"
           },
+          "422": {
+            "description": "Unprocessable Entity"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -213,13 +203,9 @@
     },
     "/transactions/{transactionId}/{splitId}": {
       "get": {
-        "tags": [
-          "Splits"
-        ],
+        "tags": ["Splits"],
         "description": "",
-        "produces": [
-          "application/json"
-        ],
+        "produces": ["application/json"],
         "parameters": [
           {
             "name": "transactionId",
@@ -241,15 +227,16 @@
           "404": {
             "description": "Not Found"
           },
+          "422": {
+            "description": "Unprocessable Entity"
+          },
           "500": {
             "description": "Internal Server Error"
           }
         }
       },
       "put": {
-        "tags": [
-          "Splits"
-        ],
+        "tags": ["Splits"],
         "description": "\r  {\r  \"categoryName\": \"Transfers\",\r  \"splitAmount\": 93.00,\r  \"splitNote\": \"Car Insurance Bill Due\" ,\r  \"confirmAddCategory\": true\r  }\r  ",
         "parameters": [
           {
@@ -305,9 +292,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "Splits"
-        ],
+        "tags": ["Splits"],
         "description": "",
         "parameters": [
           {
@@ -327,6 +312,9 @@
           "204": {
             "description": "No Content"
           },
+          "422": {
+            "description": "Unprocessable Entity"
+          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -335,9 +323,7 @@
     },
     "/transactions/{transactionId}/": {
       "post": {
-        "tags": [
-          "Splits"
-        ],
+        "tags": ["Splits"],
         "description": "\r  {\r  \"categoryName\": \"Transfers\",\r  \"splitAmount\": 93,\r  \"splitNote\": \"\",\r  \"confirmAddCategory\": true\r  }\r  ",
         "parameters": [
           {
@@ -380,16 +366,6 @@
           },
           "500": {
             "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/api-docs": {
-      "get": {
-        "description": "",
-        "responses": {
-          "default": {
-            "description": ""
           }
         }
       }
