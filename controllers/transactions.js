@@ -102,14 +102,15 @@ const importFromCSV = async (req, res) => {
     #swagger.tags=['Transactions']
     #swagger.description='Testing file Path: C:\\\\Users\\\\Admin\\\\OneDrive - BYU-Idaho\\\\Backend Classes\\\\CSE341-Web Services- Assignments\\\\CSE341_Week03-04_Project_Budget\\\\files\\\\CHECKING.csv'
   */
-  const csvFilePath = req.body.csvFilePath;
-  const accountName = path.parse(csvFilePath).name;
 
   try {
     //validate that the csvFilePath is provided
-    if (!csvFilePath) {
-      return res.status(400).json({ error: 'CSV file path is required' });
+    if (!req.file) {
+      return res.status(400).json({ error: 'Please upload a CSV file' });
     }
+
+    const csvFilePath = req.file.path;
+    const accountName = path.parse(csvFilePath).name;
 
     // Need to make sure we are only importing where there is a value and not an empty string
     const transactionJsonArray = await csv({ delimiter: '\t' })

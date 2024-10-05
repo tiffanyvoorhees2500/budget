@@ -1,4 +1,6 @@
 const routes = require('express').Router();
+const multer = require('multer');
+const path = require('path');
 const transactionController = require('../controllers/transactions.js');
 const splitsController = require('../controllers/splits.js');
 const utilities = require('../utilities/');
@@ -21,7 +23,25 @@ routes.post(
   transactionController.addNew,
   utilities.handleErrors
 );
-routes.post('/import', transactionController.importFromCSV, utilities.handleErrors);
+
+// Configure multer for file upload
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, '../files'); // Ensure you have an 'files' folder
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname)); // Save with a unique name
+  },
+});
+
+const upload = multer({ storage });
+
+routes.post(
+  '/import',
+  upload.single('csvFile'),
+  transactionController.importFromCSV,
+  utilities.handleErrors
+);
 
 // UPDATE Transaction Route
 routes.put(
