@@ -1,6 +1,5 @@
 const routes = require('express').Router();
 const multer = require('multer');
-const upload = multer({ dest: 'files/' });
 const transactionController = require('../controllers/transactions.js');
 const splitsController = require('../controllers/splits.js');
 const utilities = require('../utilities/');
@@ -23,6 +22,17 @@ routes.post(
   transactionController.addNew,
   utilities.handleErrors
 );
+
+const storage = multer.diskStorage({
+  // notice you are calling the multer.diskStorage() method here, not multer()
+  path: function (req, file, cb) {
+    cb(null, 'files/');
+  },
+  originalName: function (req, file, cb) {
+    cb(null, file.originalname + '-' + Date.now());
+  },
+});
+const upload = multer({ storage }); //provide the return value from
 
 routes.post(
   '/import',

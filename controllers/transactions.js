@@ -110,7 +110,7 @@ const importFromCSV = async (req, res) => {
     }
 
     const csvFilePath = req.file.path;
-    const accountName = path.parse(csvFilePath).originalName;
+    const accountName = req.file.originalname.slice(0,-4);
 
     // Need to make sure we are only importing where there is a value and not an empty string
     const transactionJsonArray = await csv({ delimiter: '\t' })
