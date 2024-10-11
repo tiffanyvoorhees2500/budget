@@ -46,7 +46,8 @@ const getSingle = async (req, res) => {
     res.status(200).json(splitDetail);
   } catch (error) {
     console.log('Error:', error.message);
-    res.status(500).json({ error: error.message });
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
@@ -125,7 +126,8 @@ const addNew = async (req, res) => {
     res.status(201).json(transaction);
   } catch (error) {
     console.log('Error:', error.message);
-    res.status(500).json({ error: error.message });
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 

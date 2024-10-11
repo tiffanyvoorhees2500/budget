@@ -20,7 +20,9 @@ const getAll = async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(transactions);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log('Error:', error.message);
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
@@ -55,7 +57,9 @@ const getSingle = async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(transaction);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log('Error:', error.message);
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
@@ -117,7 +121,9 @@ const addNew = async (req, res) => {
     //if all goes well, return success status
     res.status(201).json(newTransaction);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log('Error:', error.message);
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
@@ -210,7 +216,9 @@ const importFromCSV = async (req, res) => {
       result,
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log('Error:', error.message);
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
@@ -281,7 +289,9 @@ const editSingle = async (req, res) => {
     //if all goes well, return accepted status
     res.status(202).json(updatedTransaction);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log('Error:', error.message);
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
@@ -309,7 +319,9 @@ const deleteSingle = async (req, res) => {
 
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log('Error:', error.message);
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
