@@ -203,6 +203,7 @@ const deleteSingle = async (req, res) => {
     #swagger.tags=['Splits']
   */
   const transactionId = req.params.transactionId;
+  const userId = ObjectId.createFromHexString(req.session.user._id);
   const splitId = req.params.splitId;
 
   try {
