@@ -13,9 +13,9 @@ const getAll = async (req, res) => {
 
   try {
     const userId = ObjectId.createFromHexString(req.session.user._id);
-    const transactions = await Transaction.find({ user: userId })
-      .populate('account')
-      .populate('user');
+    const transactions = await Transaction.find({ user: userId });
+    // .populate('account')
+    // .populate('user');
 
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(transactions);
@@ -33,8 +33,8 @@ const getSingle = async (req, res) => {
 
   try {
     const transaction = await Transaction.findById(transactionId)
-      .populate('account')
-      .populate('user')
+      // .populate('account')
+      // .populate('user')
       .exec();
 
     // Check if transaction exists, and if the userId matches the user logged in
@@ -111,8 +111,8 @@ const addNew = async (req, res) => {
     });
 
     //Populate with the account object
-    await newTransaction.populate('account');
-    await newTransaction.populate('user');
+    // await newTransaction.populate('account');
+    // await newTransaction.populate('user');
 
     //if all goes well, return success status
     res.status(201).json(newTransaction);
@@ -270,8 +270,8 @@ const editSingle = async (req, res) => {
     );
 
     if (updatedTransaction) {
-      await updatedTransaction.populate('account');
-      await updatedTransaction.populate('user');
+      // await updatedTransaction.populate('account');
+      // await updatedTransaction.populate('user');
     } else {
       return res
         .status(404)
@@ -300,12 +300,11 @@ const deleteSingle = async (req, res) => {
       user: userId,
     });
 
+    console.log(transaction);
     if (!transaction) {
-      res
-        .status(404)
-        .json({
-          message: `You are not authorized to delete that transaction.`,
-        });
+      return res.status(404).json({
+        message: `You are not authorized to delete that transaction.`,
+      });
     }
 
     res.status(204).send();

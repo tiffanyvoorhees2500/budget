@@ -15,12 +15,12 @@ const getSingle = async (req, res) => {
 
   try {
     const transaction = await Transaction.findById(transactionId)
-      .populate({
-        path: 'splits',
-        populate: {
-          path: 'category',
-        },
-      })
+      // .populate({
+      //   path: 'splits',
+      //   populate: {
+      //     path: 'category',
+      //   },
+      // })
       .exec();
 
     if (!transaction) {
@@ -111,14 +111,15 @@ const addNew = async (req, res) => {
       { new: true }
     );
 
+    console.log(transaction);
     if (!transaction) {
       res.status(404).json({
         message: `You do not have a transaction by that ID to add a split to.`,
       });
+    } else {
+      // await transaction.populate('account');
+      // await transaction.populate('user');
     }
-
-    await transaction.populate('account');
-    await transaction.populate('user');
 
     res.status(201).json(transaction);
   } catch (error) {
@@ -198,10 +199,11 @@ const editSingle = async (req, res) => {
     splitDetail.splitNote = splitNote;
 
     await transaction.save();
-    await transaction.populate([
-      { path: 'account' }, // Populate the account field
-      { path: 'splits', populate: { path: 'category' } }, // Populate splits and their categories
-    ]);
+
+    // await transaction.populate([
+    //   { path: 'account' }, // Populate the account field
+    //   { path: 'splits', populate: { path: 'category' } }, // Populate splits and their categories
+    // ]);
 
     res.status(202).json(transaction);
   } catch (error) {
