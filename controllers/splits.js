@@ -1,5 +1,7 @@
-const Transaction = require('../models/transaction');
-const Category = require('../models/category');
+const Transaction = require('../models/Transaction');
+const Category = require('../models/Category');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
 //getAll does not work in this case.  To see all splits for a transaction, do a Get Transaction By ID
 const getSingle = async (req, res) => {
@@ -9,6 +11,7 @@ const getSingle = async (req, res) => {
 
   const transactionId = req.params.transactionId;
   const splitId = req.params.splitId;
+  const userId = ObjectId.createFromHexString(req.session.user._id);
 
   try {
     const transaction = await Transaction.findById(transactionId)
@@ -23,6 +26,11 @@ const getSingle = async (req, res) => {
     if (!transaction) {
       return res.status(404).json({
         error: `Transaction with id: ${transactionId} does not exist.`,
+      });
+    }
+    if (!transaction.user.equals(userId)) {
+      return res.status(404).json({
+        message: `The transaction you are looking for does not exist.`,
       });
     }
 
@@ -44,21 +52,25 @@ const getSingle = async (req, res) => {
 const addNew = async (req, res) => {
   /*
     #swagger.tags=['Splits']
-    #swagger.description = '
-      {
-        "categoryName": "Transfers",
-        "splitAmount": 93,
-        "splitNote": "",
-        "confirmAddCategory": true
+    #swagger.parameters['body'] = {
+      in: 'body',
+      description: 'Create a new Split',
+      schema: {
+        categoryName: 'Transfers',
+        splitAmount: 93,
+        splitNote: '',
+        confirmAddCategory: true
       }
-    '
+    }
   */
   const transactionId = req.params.transactionId;
+  const userId = ObjectId.createFromHexString(req.session.user._id);
   const { categoryName, splitAmount, splitNote, confirmAddCategory } = req.body;
 
   try {
     // Check if the categoryName exists in the categories collection
     let category = await Category.findOne({
+      user: userId,
       categoryName: categoryName,
     });
 
@@ -67,7 +79,7 @@ const addNew = async (req, res) => {
       // check if the user confirmed adding the new category
       if (confirmAddCategory) {
         // If the user confirmed, add the new category to the categories collection
-        category = await Category.create({ categoryName: categoryName });
+        category = await Category.create({ user: userId, categoryName: categoryName });
 
         console.log(
           `New category '${categoryName}' added to the categories collection.`
@@ -89,13 +101,15 @@ const addNew = async (req, res) => {
       splitNote: splitNote,
     };
 
-    const transaction = await Transaction.findByIdAndUpdate(
-      transactionId, // Filter by transaction ID
+    const updateCriteria = { user: userId, _id: transactionId };
+    const transaction = await Transaction.findOneAndUpdate(
+      updateCriteria,
       { $push: { splits: split } }, // Add the split to the splits array
       { new: true }
     );
 
     await transaction.populate('account');
+    await transaction.populate('user');
 
     res.status(201).json(transaction);
   } catch (error) {
@@ -105,18 +119,21 @@ const addNew = async (req, res) => {
 };
 
 const editSingle = async (req, res) => {
-/*
+  /*
   #swagger.tags=["Splits"]
-  #swagger.description = '
-    {
-      "categoryName": "Transfers",
-      "splitAmount": 93.00,
-      "splitNote": "Car Insurance Bill Due" ,
-      "confirmAddCategory": true
+  #swagger.parameters['body'] = {
+    in: 'body',
+    description: 'Edit a Split',
+    schema: {
+      categoryName: 'Transfers',
+      splitAmount: 93,
+      splitNote: 'Car Insurance Bill Due',
+      confirmAddCategory: true
     }
-  '
+  }
 */
   const transactionId = req.params.transactionId;
+  const userId = ObjectId.createFromHexString(req.session.user._id);
   const splitId = req.params.splitId;
 
   const { categoryName, splitAmount, splitNote, confirmAddCategory } = req.body;
@@ -128,8 +145,15 @@ const editSingle = async (req, res) => {
       return res.status(404).json({ error: 'Transaction not found' });
     }
 
+    if (!transaction.user.equals(userId)) {
+      return res.status(404).json({
+        message: `The transaction you are looking for does not exist.`,
+      });
+    }
+
     // Check if the categoryName exists in the categories collection
     let category = await Category.findOne({
+      user: userId,
       categoryName: categoryName,
     });
 
@@ -137,7 +161,7 @@ const editSingle = async (req, res) => {
       // If the category doesn't exist, check if the user confirmed adding the new category
       if (confirmAddCategory) {
         // If the user confirmed, add the new category to the categories collection
-        category = await Category.create({ categoryName: categoryName });
+        category = await Category.create({ user: userId, categoryName: categoryName });
 
         console.log(
           `New category '${categoryName}' added to the categories collection.`
@@ -183,6 +207,13 @@ const deleteSingle = async (req, res) => {
 
   try {
     const transaction = await Transaction.findById(transactionId);
+
+    if (!transaction.user.equals(userId)) {
+      return res.status(404).json({
+        message: `The transaction you are trying to delete a split from does not exist.`,
+      });
+    }
+
     // Filter out the split you want to delete
     transaction.splits = transaction.splits.filter(
       (split) => split._id.toString() !== splitId

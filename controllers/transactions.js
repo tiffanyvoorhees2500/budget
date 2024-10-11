@@ -1,15 +1,21 @@
-const Transaction = require('../models/transaction');
-const Account = require('../models/account');
+const Transaction = require('../models/Transaction');
+const Account = require('../models/Account');
+const mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 
-const path = require('path');
 const csv = require('csvtojson');
 
+// This is really getAllByUser
 const getAll = async (req, res) => {
   /*
     #swagger.tags=['Transactions']
   */
+
   try {
-    const transactions = await Transaction.find().populate('account');
+    const userId = ObjectId.createFromHexString(req.session.user._id);
+    const transactions = await Transaction.find({ user: userId })
+      .populate('account')
+      .populate('user');
 
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(transactions);
@@ -28,11 +34,21 @@ const getSingle = async (req, res) => {
   try {
     const transaction = await Transaction.findById(transactionId)
       .populate('account')
+      .populate('user')
       .exec();
 
+    // Check if transaction exists, and if the userId matches the user logged in
     if (!transaction) {
       return res.status(404).json({
         error: `Transaction with id: '${transactionId}' does not exist.`,
+      });
+    }
+
+    const userId = ObjectId.createFromHexString(req.session.user._id);
+
+    if (!transaction.user.equals(userId)) {
+      return res.status(404).json({
+        message: `The transaction you are looking for does not exist.`,
       });
     }
 
@@ -46,14 +62,16 @@ const getSingle = async (req, res) => {
 const addNew = async (req, res) => {
   /*
     #swagger.tags=['Transactions']
-    #swagger.description = '
-      {
-        "accountName": "Cash",
-        "transactionAmount": 5,
-        "transactionDate": "2024-10-03T00:00:00.000Z",
-        "transactionDescription": "Isaac gave me cash"
+    #swagger.parameters['body'] = {
+      in: 'body',
+      description: 'Create a new Transaction',
+      schema: {
+        accountName: 'Cash',
+        transactionAmount: 5,
+        transactionDate: '2024-10-03T00:00:00.000Z',
+        transactionDescription: 'Isaac gave me cash'
       }
-    '
+    }
   */
   const {
     accountName,
@@ -62,25 +80,30 @@ const addNew = async (req, res) => {
     transactionDescription,
   } = req.body;
 
+  const userId = ObjectId.createFromHexString(req.session.user._id);
+
   try {
     // Fetch the account document based on accountName
     let account = await Account.findOne({
       accountName: accountName,
+      user: userId,
     });
 
     // If we don't have an account with the same name as the CSV file, we will create one
     if (!account) {
       account = await Account.create({
+        user: userId,
         accountName: accountName,
         accountBeginningBalance: 0,
       });
 
       console.log(
-        `New category '${accountName}' added to the accounts collection.`
+        `New category '${accountName}' added to the categories collection.`
       );
     }
 
     const newTransaction = await Transaction.create({
+      user: userId,
       account: account._id,
       transactionAmount: transactionAmount,
       transactionDate: transactionDate,
@@ -89,6 +112,7 @@ const addNew = async (req, res) => {
 
     //Populate with the account object
     await newTransaction.populate('account');
+    await newTransaction.populate('user');
 
     //if all goes well, return success status
     res.status(201).json(newTransaction);
@@ -100,7 +124,17 @@ const addNew = async (req, res) => {
 const importFromCSV = async (req, res) => {
   /*
     #swagger.tags=['Transactions']
-    #swagger.description='Testing file Path: C:\\\\Users\\\\Admin\\\\OneDrive - BYU-Idaho\\\\Backend Classes\\\\CSE341-Web Services- Assignments\\\\CSE341_Week03-04_Project_Budget\\\\files\\\\CHECKING.csv'
+    #swagger.summary='Upload a CSV Bank Transaction File'
+    #swagger.consumes=['multipart/form-data']
+    #swagger.parameters=[
+      {
+        "name": "csvFile",
+        "in": "formData",
+        "description": "CSV file to upload",
+        "required": true,
+        "type": "file"
+      }
+    ]
   */
 
   try {
@@ -110,7 +144,8 @@ const importFromCSV = async (req, res) => {
     }
 
     const csvFilePath = req.file.path;
-    const accountName = req.file.originalname.slice(0,-4);
+    const accountName = req.file.originalname.slice(0, -4);
+    const userId = ObjectId.createFromHexString(req.session.user._id);
 
     // Need to make sure we are only importing where there is a value and not an empty string
     const transactionJsonArray = await csv({ delimiter: '\t' })
@@ -126,11 +161,13 @@ const importFromCSV = async (req, res) => {
     // Fetch the account document based on accountName
     let account = await Account.findOne({
       accountName: accountName,
+      user: userId,
     });
 
     // If we don't have an account with the same name as the CSV file, we will create one
     if (!account) {
       account = await Account.create({
+        user: userId,
         accountName: accountName,
         accountBeginningBalance: 0,
       });
@@ -149,6 +186,7 @@ const importFromCSV = async (req, res) => {
 
         // Assign the account document to the transaction
         transaction['account'] = account._id;
+        transaction['user'] = userId;
 
         return transaction;
       })
@@ -176,16 +214,21 @@ const importFromCSV = async (req, res) => {
 const editSingle = async (req, res) => {
   /*
     #swagger.tags=['Transactions']
-    #swagger.description = '
-      {
-        "accountName": "Cash",
-        "transactionAmount": 5,
-        "transactionDate": "2024-10-03T00:00:00.000Z",
-        "transactionDescription": "Alex gave me cash"
+    #swagger.parameters['body'] = {
+      in: 'body',
+      description: 'Create a new Transaction',
+      schema: {
+        accountName: 'Cash',
+        transactionAmount: 5,
+        transactionDate: '2024-10-03T00:00:00.000Z',
+        transactionDescription: 'Alex gave me cash'
       }
-    '
+    }
+    #swagger.description = 'Change Isaac gave me cash to Alex gave me cash'
   */
   const transactionId = req.params.transactionId;
+  const userId = ObjectId.createFromHexString(req.session.user._id);
+
   const {
     accountName,
     transactionAmount,
@@ -196,29 +239,41 @@ const editSingle = async (req, res) => {
   try {
     // Fetch the account document based on accountName
     let account = await Account.findOne({
+      user: userId,
       accountName: accountName,
     });
 
     // If we don't have an account with the same name as the CSV file, we will create one
     if (!account) {
       account = await Account.create({
+        user: userId,
         accountName: accountName,
         accountBeginningBalance: 0,
       });
     }
 
-    const updatedTransaction = await Transaction.findByIdAndUpdate(
-      transactionId,
+    const updateCriteria = { user: userId, _id: transactionId };
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      updateCriteria,
       {
-        account: account._id,
-        transactionAmount: transactionAmount,
-        transactionDate: transactionDate,
-        transactionDescription: transactionDescription,
+        $set: {
+          account: account._id,
+          transactionAmount: transactionAmount,
+          transactionDate: transactionDate,
+          transactionDescription: transactionDescription,
+        },
       },
       { new: true } // Return the updated document
     );
 
-    await updatedTransaction.populate('account');
+    if (updatedTransaction) {
+      await updatedTransaction.populate('account');
+      await updatedTransaction.populate('user');
+    } else {
+      return res
+        .status(404)
+        .json({ message: 'This transaction could not be updated.' });
+    }
 
     //if all goes well, return accepted status
     res.status(202).json(updatedTransaction);
@@ -234,8 +289,10 @@ const deleteSingle = async (req, res) => {
   */
   const transactionId = req.params.transactionId;
 
+  const userId = ObjectId.createFromHexString(req.session.user._id);
+
   try {
-    await Transaction.findByIdAndDelete(transactionId);
+    await Transaction.findOneAndDelete({ _id: transactionId, user: userId });
 
     res.status(204).send();
   } catch (error) {

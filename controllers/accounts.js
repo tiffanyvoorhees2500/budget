@@ -1,6 +1,4 @@
-const mongoose = require('../db/connection');
-const csv = require('csvtojson');
-const Account = require('../models/account');
+const Account = require('../models/Account');
 
 const getAll = async (req, res) => {
   try {

@@ -1,12 +1,13 @@
 const swaggerAutogen = require('swagger-autogen')();
 
+//Use this for DEV
 const doc = {
   info: {
     title: 'Tiffany Voorhees - Budget API',
     description: 'Budgeting',
   },
   host: 'localhost:3000',
-  schemes: ['http', 'https'],
+  schemes: ['http'],
 };
 
 const outputFile = './swagger-output.json';

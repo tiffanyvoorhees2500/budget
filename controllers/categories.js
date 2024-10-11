@@ -1,5 +1,4 @@
-const mongoose = require('../db/connection');
-const Category = require('../models/category');
+const Category = require('../models/Category');
 
 const getAll = async (req, res) => {
   try {

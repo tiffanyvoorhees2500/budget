@@ -5,18 +5,25 @@ const splitsController = require('../controllers/splits.js');
 const utilities = require('../utilities/');
 const transactionRules = require('../utilities/transaction-validation.js');
 const splitRules = require('../utilities/splits-validation.js');
+const { ensureAuth } = require('../utilities/auth.js');
 
 // GET Transaction Route
-routes.get('/', transactionController.getAll, utilities.handleErrors);
+routes.get(
+  '/',
+  ensureAuth,
+  transactionController.getAll,
+  utilities.handleErrors
+);
 routes.get(
   '/:transactionId',
+  ensureAuth,
   transactionController.getSingle,
   utilities.handleErrors
 );
 
-// CREATE Transaction Route (Can be done manually or via importing CSV file)
 routes.post(
   '/',
+  ensureAuth,
   transactionRules.transactionValidationRules(),
   utilities.validate,
   transactionController.addNew,
@@ -36,6 +43,7 @@ const upload = multer({ storage }); //provide the return value from
 
 routes.post(
   '/import',
+  ensureAuth,
   upload.single('csvFile'),
   transactionController.importFromCSV,
   utilities.handleErrors
@@ -44,6 +52,7 @@ routes.post(
 // UPDATE Transaction Route
 routes.put(
   '/:transactionId',
+  ensureAuth,
   transactionRules.transactionValidationRules(),
   utilities.validate,
   transactionController.editSingle,
@@ -53,6 +62,7 @@ routes.put(
 // DELETE Transaction Route
 routes.delete(
   '/:transactionId',
+  ensureAuth,
   transactionController.deleteSingle,
   utilities.handleErrors
 );
@@ -61,6 +71,7 @@ routes.delete(
 // GET SINGLE nested split inside transaction Route
 routes.get(
   '/:transactionId/:splitId',
+  ensureAuth,
   splitsController.getSingle,
   utilities.handleErrors
 );
@@ -68,6 +79,7 @@ routes.get(
 // CREATE new split nested inside transaction
 routes.post(
   '/:transactionId/',
+  ensureAuth,
   splitRules.splitsValidationRules(),
   utilities.validate,
   splitsController.addNew,
@@ -77,6 +89,7 @@ routes.post(
 // UPDATE nested split inside transaction Route
 routes.put(
   '/:transactionId/:splitId',
+  ensureAuth,
   splitRules.splitsValidationRules(),
   utilities.validate,
   splitsController.editSingle,
@@ -86,6 +99,7 @@ routes.put(
 // DELETE nested split inside transaction Route
 routes.delete(
   '/:transactionId/:splitId',
+  ensureAuth,
   splitsController.deleteSingle,
   utilities.handleErrors
 );
