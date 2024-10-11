@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 
 //getAll does not work in this case.  To see all splits for a transaction, do a Get Transaction By ID
-const getSingle = async (req, res) => {
+const getSingle = async (req, res, next) => {
   /*
     #swagger.tags=['Splits']
   */
@@ -51,7 +51,7 @@ const getSingle = async (req, res) => {
   }
 };
 
-const addNew = async (req, res) => {
+const addNew = async (req, res, next) => {
   /*
     #swagger.tags=['Splits']
     #swagger.parameters['body'] = {
@@ -113,15 +113,14 @@ const addNew = async (req, res) => {
       { new: true }
     );
 
-    console.log(transaction);
     if (!transaction) {
-      res.status(404).json({
+      return res.status(404).json({
         message: `You do not have a transaction by that ID to add a split to.`,
       });
-    } else {
-      // await transaction.populate('account');
-      // await transaction.populate('user');
     }
+
+    // await transaction.populate('account');
+    // await transaction.populate('user');
 
     res.status(201).json(transaction);
   } catch (error) {
@@ -131,7 +130,7 @@ const addNew = async (req, res) => {
   }
 };
 
-const editSingle = async (req, res) => {
+const editSingle = async (req, res, next) => {
   /*
   #swagger.tags=["Splits"]
   #swagger.parameters['body'] = {
@@ -217,7 +216,7 @@ const editSingle = async (req, res) => {
 };
 
 //DELETE
-const deleteSingle = async (req, res) => {
+const deleteSingle = async (req, res, next) => {
   /*
     #swagger.tags=['Splits']
   */

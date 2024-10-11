@@ -6,7 +6,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const csv = require('csvtojson');
 
 // This is really getAllByUser
-const getAll = async (req, res) => {
+const getAll = async (req, res, next) => {
   /*
     #swagger.tags=['Transactions']
   */
@@ -26,7 +26,7 @@ const getAll = async (req, res) => {
   }
 };
 
-const getSingle = async (req, res) => {
+const getSingle = async (req, res, next) => {
   /*
     #swagger.tags=['Transactions']
   */
@@ -63,7 +63,7 @@ const getSingle = async (req, res) => {
   }
 };
 
-const addNew = async (req, res) => {
+const addNew = async (req, res, next) => {
   /*
     #swagger.tags=['Transactions']
     #swagger.parameters['body'] = {
@@ -127,7 +127,7 @@ const addNew = async (req, res) => {
   }
 };
 
-const importFromCSV = async (req, res) => {
+const importFromCSV = async (req, res, next) => {
   /*
     #swagger.tags=['Transactions']
     #swagger.summary='Upload a CSV Bank Transaction File'
@@ -222,7 +222,7 @@ const importFromCSV = async (req, res) => {
   }
 };
 
-const editSingle = async (req, res) => {
+const editSingle = async (req, res, next) => {
   /*
     #swagger.tags=['Transactions']
     #swagger.parameters['body'] = {
@@ -296,7 +296,7 @@ const editSingle = async (req, res) => {
 };
 
 //DELETE
-const deleteSingle = async (req, res) => {
+const deleteSingle = async (req, res, next) => {
   /*
     #swagger.tags=['Transactions']
   */
