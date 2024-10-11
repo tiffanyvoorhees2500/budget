@@ -30,7 +30,7 @@ const getSingle = async (req, res) => {
     }
     if (!transaction.user.equals(userId)) {
       return res.status(404).json({
-        message: `The transaction you are looking for does not exist.`,
+        message: `You do not have a transaction with id: ${transactionId}.`,
       });
     }
 
@@ -79,7 +79,10 @@ const addNew = async (req, res) => {
       // check if the user confirmed adding the new category
       if (confirmAddCategory) {
         // If the user confirmed, add the new category to the categories collection
-        category = await Category.create({ user: userId, categoryName: categoryName });
+        category = await Category.create({
+          user: userId,
+          categoryName: categoryName,
+        });
 
         console.log(
           `New category '${categoryName}' added to the categories collection.`
@@ -107,6 +110,12 @@ const addNew = async (req, res) => {
       { $push: { splits: split } }, // Add the split to the splits array
       { new: true }
     );
+
+    if (!transaction) {
+      res.status(404).json({
+        message: `You do not have a transaction by that ID to add a split to.`,
+      });
+    }
 
     await transaction.populate('account');
     await transaction.populate('user');
@@ -147,7 +156,7 @@ const editSingle = async (req, res) => {
 
     if (!transaction.user.equals(userId)) {
       return res.status(404).json({
-        message: `The transaction you are looking for does not exist.`,
+        message: `You do not have a transaction by that ID to edit a split for.`,
       });
     }
 
@@ -161,7 +170,10 @@ const editSingle = async (req, res) => {
       // If the category doesn't exist, check if the user confirmed adding the new category
       if (confirmAddCategory) {
         // If the user confirmed, add the new category to the categories collection
-        category = await Category.create({ user: userId, categoryName: categoryName });
+        category = await Category.create({
+          user: userId,
+          categoryName: categoryName,
+        });
 
         console.log(
           `New category '${categoryName}' added to the categories collection.`
