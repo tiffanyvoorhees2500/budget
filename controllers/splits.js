@@ -45,6 +45,7 @@ const getSingle = async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
     res.status(200).json(splitDetail);
   } catch (error) {
+    console.log('Error:', error.message);
     res.status(500).json({ error: error.message });
   }
 };
@@ -207,7 +208,9 @@ const editSingle = async (req, res) => {
 
     res.status(202).json(transaction);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log('Error:', error.message);
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
@@ -239,7 +242,9 @@ const deleteSingle = async (req, res) => {
 
     res.status(204).json(transaction);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.log('Error:', error.message);
+    next(error);
+    // res.status(500).json({ error: error.message });
   }
 };
 
