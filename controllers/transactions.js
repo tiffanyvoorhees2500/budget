@@ -193,7 +193,10 @@ const importFromCSV = async (req, res) => {
     );
     const bulkOperations = bulk.map((transaction) => ({
       updateOne: {
-        filter: { 'Transaction ID': transaction['Transaction ID'], 'user': userId }, //Assumption that the bank CSV file provides a Transaction ID column
+        filter: {
+          'Transaction ID': transaction['Transaction ID'],
+          user: userId,
+        }, //Assumption that the bank CSV file provides a Transaction ID column
         update: { $set: transaction },
         upsert: true, //If the document doesn't exist, it will be inserted
       },
@@ -292,7 +295,18 @@ const deleteSingle = async (req, res) => {
   const userId = ObjectId.createFromHexString(req.session.user._id);
 
   try {
-    await Transaction.findOneAndDelete({ _id: transactionId, user: userId });
+    const transaction = await Transaction.findOneAndDelete({
+      _id: transactionId,
+      user: userId,
+    });
+
+    if (!transaction) {
+      res
+        .status(404)
+        .json({
+          message: `You are not authorized to delete that transaction.`,
+        });
+    }
 
     res.status(204).send();
   } catch (error) {
