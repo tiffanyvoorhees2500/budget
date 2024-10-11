@@ -193,7 +193,7 @@ const importFromCSV = async (req, res) => {
     );
     const bulkOperations = bulk.map((transaction) => ({
       updateOne: {
-        filter: { 'Transaction ID': transaction['Transaction ID'] }, //Assumption that the bank CSV file provides a Transaction ID column
+        filter: { 'Transaction ID': transaction['Transaction ID'], 'user': userId }, //Assumption that the bank CSV file provides a Transaction ID column
         update: { $set: transaction },
         upsert: true, //If the document doesn't exist, it will be inserted
       },
