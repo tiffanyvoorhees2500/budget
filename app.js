@@ -20,6 +20,7 @@ connectDB();
 const PORT = process.env.PORT || 3000;
 
 app
+  .use(express.static('public'))
   .use(express.json()) //JSON parsing
   //this is the basic express session({..}) initialization
   .use(
